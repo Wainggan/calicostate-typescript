@@ -104,6 +104,10 @@ class StateController {
 		}
 	}
 
+	is(child: StateChildController) {
+		return this.current == child;
+	}
+
 	push(child: StateChildController) {
 		this.stack.push(child);
 		this.depth++;
@@ -165,6 +169,6 @@ export class State extends StateInherit {
 	change(child: StateChild) {
 		this.controller_state.change(child.controller_child)
 	}
-	
+
 }
 
