@@ -44,7 +44,8 @@ export class State {
 	private deferchange: StateChild | null = null;
 	private running: boolean = false;
 	private current: StateChild | null = null;
-	private time: number = 0;
+	private time_state: number = 0;
+	private time_total: number = 0;
 	
 	add() {
 		const child = new StateChild(null, this);
@@ -63,7 +64,7 @@ export class State {
 		this.run('leave');
 
 		this.current = child;
-		this.time = 0;
+		this.time_state = 0;
 
 		this.run('enter');
 	}
@@ -94,7 +95,8 @@ export class State {
 		this.name = name;
 		this.current['delegate'](name);
 
-		this.time += 1;
+		this.time_state += 1;
+		this.time_total += 1;
 
 		this.running = false;
 		if (this.deferchange != null) {
@@ -106,6 +108,10 @@ export class State {
 
 	is(child: StateChild) {
 		return this.current == child;
+	}
+
+	time() {
+		return this.time_state;
 	}
 
 	private push(child: StateChild) {
