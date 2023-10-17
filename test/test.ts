@@ -1,6 +1,8 @@
 
 import { State } from '../src/state';
 
+// i have no idea how to set up tests lol sorry gl
+
 
 const test = {
 	success: true,
