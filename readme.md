@@ -1,8 +1,12 @@
 
 # calico state
 
-an tiny state machine
+a tiny state machine
 
+
+## setup
+
+no dependencies used. 
 
 
 
