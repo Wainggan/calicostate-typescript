@@ -1,16 +1,16 @@
 
-class StateChildController {
+class StateChild {
 
-	parent: StateChildController | null;
-	top: StateController;
-	data = new Map<string, () => void>();
-	constructor(parent: StateChildController | null, top: StateController) {
+	private parent: StateChild | null;
+	private top: State;
+	private data = new Map<string, () => void>();
+	constructor(parent: StateChild | null, top: State) {
 		this.parent = parent;
 		this.top = top;
 	}
 
-	add(): StateChildController {
-		const child = new StateChildController(this, this.top);
+	add(): StateChild {
+		const child = new StateChild(this, this.top);
 		return child;
 	}
 
@@ -24,34 +24,34 @@ class StateChildController {
 			this.data.get(name)!();
 	}
 
-	delegate(name: string) {
-		this.top.push(this);
+	private delegate(name: string) {
+		this.top['push'](this);
 		if (this.parent != null) {
 			this.parent.delegate(name);
 		} else {
 			this.top.child(name);
 		}
-		this.top.pop();
+		this.top['pop']();
 	}
 
 }
 
-class StateController {
+export class State {
 	
-	stack: StateChildController[] = [];
-	depth: number = 0;
-	name: string = "";
-	deferchange: StateChildController | null = null;
-	running: boolean = false;
-	current: StateChildController | null = null;
-	time: number = 0;
+	private stack: StateChild[] = [];
+	private depth: number = 0;
+	private name: string = "";
+	private deferchange: StateChild | null = null;
+	private running: boolean = false;
+	private current: StateChild | null = null;
+	private time: number = 0;
 	
 	add() {
-		const child = new StateChildController(null, this);
+		const child = new StateChild(null, this);
 		return child;
 	}
 
-	change(child: StateChildController) {
+	change(child: StateChild) {
 		if (!this.running) {
 			this.forceChange(child);
 			return;
@@ -59,7 +59,7 @@ class StateController {
 		this.deferchange = child;
 	}
 
-	forceChange(child: StateChildController) {
+	private forceChange(child: StateChild) {
 		this.run('leave');
 
 		this.current = child;
@@ -77,7 +77,7 @@ class StateController {
 		this.depth--;
 
 		const child = this.stack[this.depth];
-		if (child.data.has(name))
+		if (child['data'].has(name))
 			child.run(name);
 		else
 			this.child();
@@ -92,7 +92,7 @@ class StateController {
 		this.running = true;
 		this.depth = 0;
 		this.name = name;
-		this.current.delegate(name);
+		this.current['delegate'](name);
 
 		this.time += 1;
 
@@ -104,71 +104,18 @@ class StateController {
 		}
 	}
 
-	is(child: StateChildController) {
+	is(child: StateChild) {
 		return this.current == child;
 	}
 
-	push(child: StateChildController) {
+	private push(child: StateChild) {
 		this.stack.push(child);
 		this.depth++;
 	}
 
-	pop() {
+	private pop() {
 		this.stack.pop();
 		this.depth--;
 	}
 
 }
-
-
-class StateInherit {
-	protected controller_state: StateController | null;
-	protected controller_child: StateChildController | null;
-}
-
-export class StateChild extends StateInherit {
-
-	controller_child: StateChildController;
-	constructor(controller: StateChildController) {
-		super();
-		this.controller_child = controller;
-	}
-
-	add(): StateChild {
-		const child = this.controller_child.add();
-		return new StateChild(child);
-	}
-
-	set(name: string, callback: () => void): this {
-		this.controller_child.set(name, callback);
-		return this;
-	}
-}
-
-export class State extends StateInherit {
-
-	controller_state = new StateController();
-
-	add() {
-		const child = this.controller_state.add();
-		return new StateChild(child);
-	}
-
-	is(child: StateChild) {
-		return this.controller_state.current == child.controller_child;
-	}
-
-	run(name?: string) {
-		this.controller_state.run(name);
-	}
-
-	child(name?: string) {
-		this.controller_state.child(name);
-	}
-
-	change(child: StateChild) {
-		this.controller_state.change(child.controller_child)
-	}
-
-}
-
