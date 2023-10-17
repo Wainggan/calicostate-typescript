@@ -9,4 +9,9 @@ a tiny state machine
 no dependencies used. 
 
 
+## building
+
+```sh
+tsc ./src/state.ts --outDir ./js --lib esnext
+```
 
