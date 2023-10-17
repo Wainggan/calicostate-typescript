@@ -3,7 +3,10 @@ class StateChild {
 
 	private parent: StateChild | null;
 	private top: State;
+
+	// stores every event
 	private data = new Map<string, () => void>();
+
 	constructor(parent: StateChild | null, top: State) {
 		this.parent = parent;
 		this.top = top;
@@ -24,6 +27,9 @@ class StateChild {
 			this.data.get(name)!();
 	}
 
+	// sets up the inheritance stack.
+	// when reaches the top of the tree (parent == null), 
+	// the Stack controller begins running
 	private delegate(name: string) {
 		this.top['push'](this);
 		if (this.parent != null) {
@@ -37,16 +43,25 @@ class StateChild {
 }
 
 export class State {
-	
+
 	private stack: StateChild[] = [];
 	private depth: number = 0;
-	private name: string = "";
-	private deferchange: StateChild | null = null;
+
 	private running: boolean = false;
+
+	// current running event name
+	private name: string = "";
+
+	// the currently targeted state
 	private current: StateChild | null = null;
+
+	// if currently running, stores the next targeted state
+	// current is set to deferchange at end of run()
+	private deferchange: StateChild | null = null;
+
 	private time_state: number = 0;
 	private time_total: number = 0;
-	
+
 	add() {
 		const child = new StateChild(null, this);
 		return child;
