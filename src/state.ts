@@ -110,10 +110,6 @@ export class State {
 		return this.current == child;
 	}
 
-	time() {
-		return this.time_state;
-	}
-
 	private push(child: StateChild) {
 		this.stack.push(child);
 		this.depth++;
